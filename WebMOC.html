@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebMOC</title>
+ 
+<link rel="stylesheet" href="jquery.mobile-1.3.2.min.css" />
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="jquery.mobile-1.3.2.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).bind('pageinit', 
+        function(){
+
+            //button action 
+            $("#btnPrev").click(function(){
+                alert("Prev Clicked !!!");
+            });
+            $("#btnPlay").click(function(){
+                alert("Play Clicked !!!");
+            });
+            $("#btnNext").click(function(){
+                alert("Next Clicked !!!");
+            });
+            $("#btnPause").click(function(){
+                alert("Pause Clicked !!!");
+            });
+            $("#btnStop").click(function(){
+                alert("Stop Clicked !!!");
+            });
+
+        });
+
+</script>
+</head>
+ 
+<body>
+This is Web MOC controller. 
+<div data-role="controlgroup" data-type="horizontal">
+    <a href="#" id="btnPrev" data-role="button">Prev</a>
+    <a href="#" id="btnPlay" data-role="button">Play</a>
+    <a href="#" id="btnNext" data-role="button">Next</a>
+    <a href="#" id="btnPause" data-role="button">Pause</a>
+    <a href="#" id="btnStop" data-role="button">Stop</a>
+</div>
+</body>
+</html>
