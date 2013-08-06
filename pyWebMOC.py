@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 
-from bottle import route, static_file, error, debug, run, get, view, redirect
+# Static Routes http://stackoverflow.com/questions/10486224/bottle-static-files
 
+from bottle import route, static_file, debug, run, get, view, redirect
+import os, inspect
+
+#enable bottle debug
 debug(True)
 
+# WebApp route path
 routePath = '/pyWebMOC'
-rootPath = './'
+# get directory of WebApp (pyWebMOC.py's dir)
+rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 @route(routePath)
 def rootHome():
@@ -15,28 +21,13 @@ def rootHome():
 def home():
     return static_file("index.html", root=rootPath)
 
-@get(routePath + '/images/:filename')
-def fonts(filename):
-    return static_file(filename, root=rootPath+'assets/js/images')
-
-# Static Routes http://stackoverflow.com/questions/10486224/bottle-static-files
-#@get(routePath + '/<filename:re:.*\.js>')
-@route(routePath + '/<filename:re:.*\.js>')
-def javascripts(filename):
-    return static_file(filename, root=rootPath+'assets/js')
-
-#@get(routePath + '/<filename:re:.*\.css>')
-@route(routePath + '/<filename:re:.*\.css>')
-def stylesheets(filename):
-    return static_file(filename, root=rootPath+'assets/css')
-
-@get(routePath + '/<filename:re:.*\.(jpg|png|gif|ico)>')
-def images(filename):
-    return static_file(filename, root=rootPath+'assets/img')
-
-#@get(routePath + '/<filename:re:.*\.html>')
 @route(routePath + '/<filename:re:.*\.html>')
-def html(filename):
+def html_file(filename):
     return static_file(filename, root=rootPath)
 
+@get(routePath + '/assets/<filepath:path>')
+def assets_file(filepath):
+    return static_file(filepath, root=rootPath+'/assets')
+
 run(host='localhost', port=8080, reloader=True)
+
