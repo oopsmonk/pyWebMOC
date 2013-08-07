@@ -3,8 +3,8 @@
 # Static Routes http://stackoverflow.com/questions/10486224/bottle-static-files
 
 from bottle import route, static_file, debug, run, get, view, redirect
-from bottle import post
-import os, inspect
+from bottle import post, request, response
+import os, inspect, json
 
 #enable bottle debug
 debug(True)
@@ -31,13 +31,27 @@ def assets_file(filepath):
     return static_file(filepath, root=rootPath+'/assets')
 
 #http://gotofritz.net/blog/weekly-challenge/restful-python-api-bottle/
-@get(routePath + '/jsontest')
-def returnJSON():
+"""
+POST action
+curl -i -X GET http://localhost:8080/pyWebMOC/jsonGET
+
+GET action
+curl -X POST -H "Content-Type: application/json" -d '{"id":"1","name":"OopsMonk"}' http://localhost:8080/pyWebMOC/jsonPOST
+"""
+@get(routePath + '/json')
+def testJsonGET():
+    print dict(request.headers)
     return {"id":1,"name":"Sam"}
 
-@post(routePath + '/postTest')
-def testPost():
-    return {"id":2,"name":"OopsMonk"}
+@post(routePath + '/json')
+def testJsonPost():
+    #print dict(request.headers)
+    data = request.json
+    print data
+    if data == None:
+        return json.dumps({'Status':"Failed!"})
+    else:
+        return json.dumps({'Status':"Success!"})
 
 @get(routePath + '/gettest')
 def gettest():
