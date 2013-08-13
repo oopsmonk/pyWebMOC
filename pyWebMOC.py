@@ -2,10 +2,10 @@
 
 # Static Routes http://stackoverflow.com/questions/10486224/bottle-static-files
 
-from bottle import route, static_file, debug, run, get, view, redirect
+from bottle import route, static_file, debug, run, get, redirect
 from bottle import post, request, response
 import os, inspect, json
-import moc
+import PlayerCtl as player
 
 #enable bottle debug
 debug(True)
@@ -18,10 +18,6 @@ rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 @route(routePath)
 def rootHome():
     return redirect(routePath+'/index.html')
-
-@view(routePath + '/index.html')
-def home():
-    return static_file("index.html", root=rootPath)
 
 @route(routePath + '/<filename:re:.*\.html>')
 def html_file(filename):
@@ -48,7 +44,12 @@ Function list
     * Song name
     * current time
     * duration
-    * 
+
+* Play list
+    * Append
+    * add (clean old list)
+    * clean
+
 """
 
 #control GET API return 
@@ -60,7 +61,7 @@ def MOCControlGET():
     1: Pause
     2: Playing
     """
-    st = moc.get_state()
+    st = player.getStatus()
     print "Get moc server status : %d" % st
     return json.dumps({'Status':st})
 
@@ -69,24 +70,38 @@ def CtlHandle(data):
     """
     request:
     {'do':action}
-    action:
-    0: Prev 
-    1: Play/Pause
-    2: Next
-    3: Stop
-    4: Volume
-    5: Add playlist
-    6: append playlist
-    7: clear playlist
-    8:
     response:
     {'ack': error}
     error:
     0: Success
     not zero: Failed.
     """
-
-    return json.dumps({'ack':0})
+    if 'do' in data:
+        #do action  parser
+        ret = 0
+        act = data.get('do')
+        if act == 'Prev':
+            ret = player.doPrev()
+        elif act == 'Play':
+            ret = player.doPlay()
+        elif act == 'Next':
+            ret = player.doNext()
+        elif act == 'Stop':
+            ret = player.doStop()
+        elif act == 'Pause':
+            ret = player.doPause()
+        elif act == 'Volume':
+            vol = data.get('SetVolume')
+            ret = player.doVolume(vol)
+        elif act == 'Quit':
+            ret = player.doQuit()
+        elif act == 'Seek':
+            sec = data.get('doSeek')
+            ret = player.doSeek(sec)
+        print "ret  = ", ret
+        return json.dumps({'ack': ret})
+    else:
+        return json.dumps({'ack':-1})
 
 #control POST API
 @post(routePath + '/ctl')
@@ -95,7 +110,7 @@ def MOCControlPOST():
     if data == None:
         return json.dumps({'ack': -1})
 
-    print "Get cmd : %s" % data 
+    print "Get cmd : ", data
     return CtlHandle(data)
 
 #http://gotofritz.net/blog/weekly-challenge/restful-python-api-bottle/
@@ -125,5 +140,9 @@ def testJsonPost():
 def gettest():
     return "get test return!!!\n"
 
-run(host='localhost', port=8080, reloader=True)
+
+
+test_player = player.check()
+if test_player == 0:
+    run(host='localhost', port=8080, reloader=True)
 
