@@ -94,9 +94,7 @@ def doPlay():
 
 def doPause():
     try:
-        st = getStatus() 
-        if st == 2:
-            moc.pause()
+        moc.toggle_pause()
     except:
         print traceback.fomrmat_exc()
         return -1

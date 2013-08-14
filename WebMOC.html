@@ -19,75 +19,95 @@ This is Web MOC controller.
     <a href="#" id="btnStop" data-role="button">Stop</a>
 </div>
 <script>
+    var ctlpage = 'ctl';
     //button action 
     $("#btnPrev").click(function(){
-        $.getJSON("json", function(data){
-            $.each(data, function(index, value){
-                alert("index: " + index + " , value: "+ value);
-            });
-        });
-        //alert("Prev Clicked !!!");
-    });
-
-    $("#btnPlay").click(function(){
-        alert("Play Clicked !!!");
-        /*
-        It's not work, send JSON via jQuery.post().
-        because the content-Type is not 'json'
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        that's a problem on bottle.request.json.
-
-        $.post(
-        "json", 
-        JSON.stringify({id:3, name:Ping}), 
-        function(ret_data, st){
-            alert("Server return : " + ret_data + " , status : " + st); 
-        },
-        'application/json'
-        );
-        */
-    });
-
-    $("#btnNext").click(function(){
-        //alert("Next Clicked !!!");
-        var post_data = {"id":3, "name":"Ping"};
         $.ajax
         ({
             type: 'POST',
-            url: 'json',
-            //data: JSON.stringify({id:1}),
-            data:JSON.stringify(post_data),
+            url: ctlpage,
+            data:JSON.stringify({"do":"Prev"}),
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             success: function(data){
                 $.each(data, function(index, value){
-                    alert("index: " + index + " , value: "+ value);
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
+                });
+            }
+        });
+    });
+
+    $("#btnPlay").click(function(){
+        $.ajax
+        ({
+            type: 'POST',
+            url: ctlpage,
+            data:JSON.stringify({"do":"Play"}),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            success: function(data){
+                $.each(data, function(index, value){
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
+                });
+            }
+        });
+    });
+
+    $("#btnNext").click(function(){
+        $.ajax
+        ({
+            type: 'POST',
+            url: ctlpage,
+            data:JSON.stringify({"do":"Next"}),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            success: function(data){
+                $.each(data, function(index, value){
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
                 });
             }
         });
     });
     
     $("#btnPause").click(function(){
-        alert("Pause Clicked !!!");
         $.ajax
         ({
-            url: 'json',
+            type: 'POST',
+            url: ctlpage,
+            data:JSON.stringify({"do":"Pause"}),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
             success: function(data){
                 $.each(data, function(index, value){
-                    alert("index: " + index + " , value: "+ value);
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
                 });
-            },
-            /*
-            if dataType not set, the Accept in request header is:
-            'Accept': '* / *'
-            dataType = json :
-            'Accept': 'application/json, text/javascript, * /*; q=0.01'
-            */
-            dataType: 'json'
+            }
         });
     });
     $("#btnStop").click(function(){
-        alert("Stop Clicked !!!");
+        $.ajax
+        ({
+            type: 'POST',
+            url: ctlpage,
+            data:JSON.stringify({"do":"Stop"}),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            success: function(data){
+                $.each(data, function(index, value){
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
+                });
+            }
+        });
     });
 </script>
 </body>
