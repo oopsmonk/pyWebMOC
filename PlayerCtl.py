@@ -3,6 +3,19 @@
 import moc
 import traceback
 
+def reset():
+    try:
+        #shuffle
+        moc.disable_shuffle()
+        #repeat all
+        moc.enable_repeat()
+        #auto play next
+        moc.enable_autonext()
+    except:
+        print traceback.format_exc()
+        return -1
+    return 0
+
 #check moc status.
 def check():
     try:
@@ -39,6 +52,18 @@ def getStatus():
         return -1
     print "moc state  = ", st
     return st
+
+#moc info
+def getInfo():
+    try:
+        if moc.get_state() == -1:
+            moc.start_server()
+        info = moc.get_info()
+    except:
+        print traceback.format_exc()
+        return -1
+
+    return info
 
 #doPrev will change state to STOP if playing frist song.
 def doPrev():

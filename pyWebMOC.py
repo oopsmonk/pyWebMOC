@@ -61,9 +61,12 @@ def MOCControlGET():
     1: Pause
     2: Playing
     """
-    st = player.getStatus()
-    print "Get moc server status : %d" % st
-    return json.dumps({'Status':st})
+    #st = player.getStatus()
+    #print "Get moc server status : %d" % st
+    #return json.dumps({'Status':st})
+    pinfo = player.getInfo()
+    print "Get info : \n", pinfo
+    return json.dumps(pinfo)
 
 #handle control post action
 def CtlHandle(data):
