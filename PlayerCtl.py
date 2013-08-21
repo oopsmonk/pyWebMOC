@@ -9,14 +9,17 @@ import traceback
 gInitVolume = 20
 gCurrVolume = gInitVolume
 
-gIsShuffle = False
-gIsRepeat = True
-gIsAutoNext = True
+gIsShuffle = "Off"
+gIsRepeat = "On"
+gIsAutoNext = "On"
+
+tupleTrue = ['True','ture',1,'On','on']
 
 def setShuffle(isOn):
     global gIsShuffle
     gIsShuffle = isOn 
-    if isOn == True:
+    print "set Shuffle : ", gIsShuffle 
+    if isOn in ["on","On"]:
         moc.enable_shuffle()
     else:
         moc.disable_shuffle()
@@ -28,7 +31,7 @@ def isShuffle():
 def setRepeat(isOn):
     global gIsRepeat
     gIsRepeat = isOn 
-    if isOn == True:
+    if isOn in ["on","On"]:
         moc.enable_repeat()
     else:
         moc.disable_repeat()
@@ -40,10 +43,10 @@ def isRepeat():
 def setAutoNext(isOn):
     global gIsAutoNext
     gIsAutoNext = isOn 
-    if isOn == True:
+    if isOn in ["on","On"]:
         moc.enable_autonext()
     else:
-        moc.disable_repeat()
+        moc.disable_autonext()
 
 def isAutoNext():
     global gIsAutoNext
