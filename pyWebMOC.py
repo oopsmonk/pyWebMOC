@@ -65,6 +65,7 @@ def MOCControlGET():
     #print "Get moc server status : %d" % st
     #return json.dumps({'Status':st})
     pinfo = player.getInfo()
+    pinfo.update(player.getMiscInfo())
     print "Get info : \n", pinfo
     return json.dumps(pinfo)
 
@@ -101,6 +102,17 @@ def CtlHandle(data):
         elif act == 'Seek':
             sec = data.get('doSeek')
             ret = player.doSeek(sec)
+        elif act == 'Toggles':
+            shuffle = data.get('Shuffle')
+            repeat = data.get('Repeat')
+            autoNext = data.get('AutoNext')
+            if shuffle is not None:
+                player.setShuffle(shuffle)
+            if repeat is not None:
+                player.setRepeat(repeat)
+            if autoNext is not None:
+                player.setAutoNext(autoNext)
+
         print "ret  = ", ret
         return json.dumps({'ack': ret})
     else:
@@ -145,7 +157,8 @@ def gettest():
 
 
 
-test_player = player.check()
-if test_player == 0:
-    run(host='localhost', port=8080, reloader=True)
+if player.check() == 0:
+    player.resetPlayer()
+    run(host='localhost', port=8080, reloader=True) #debug
+#    run(host='localhost', port=8080)
 

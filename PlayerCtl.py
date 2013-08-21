@@ -1,20 +1,97 @@
 #!/usr/bin/env python
 
+#http://moc.lophus.org/
 import moc
+import math
 import traceback
 
-def reset():
-    try:
-        #shuffle
+
+gInitVolume = 20
+gCurrVolume = gInitVolume
+
+gIsShuffle = False
+gIsRepeat = True
+gIsAutoNext = True
+
+def setShuffle(isOn):
+    global gIsShuffle
+    gIsShuffle = isOn 
+    if isOn == True:
+        moc.enable_shuffle()
+    else:
         moc.disable_shuffle()
-        #repeat all
+
+def isShuffle():
+    global gIsShuffle
+    return gIsShuffle
+
+def setRepeat(isOn):
+    global gIsRepeat
+    gIsRepeat = isOn 
+    if isOn == True:
         moc.enable_repeat()
-        #auto play next
+    else:
+        moc.disable_repeat()
+
+def isRepeat():
+    global gIsRepeat
+    return gIsRepeat
+
+def setAutoNext(isOn):
+    global gIsAutoNext
+    gIsAutoNext = isOn 
+    if isOn == True:
         moc.enable_autonext()
-    except:
-        print traceback.format_exc()
-        return -1
-    return 0
+    else:
+        moc.disable_repeat()
+
+def isAutoNext():
+    global gIsAutoNext
+    return gIsAutoNext
+
+def setVolume(v):
+    global gCurrVolume
+    tmp = v - gCurrVolume
+    if tmp < 0 :
+        moc.volume_down(math.fabs(tmp))
+        gCurrVolume += tmp
+    elif tmp > 0 :
+        moc.volume_up(tmp)
+        gCurrVolume += tmp
+    print "Volume set to " , gCurrVolume
+
+def getVolume():
+    global gCurrVolume
+    return gCurrVolume
+
+def resetVolume():
+    global gCurrVolume, gInitVolume
+    moc.volume_down(100)
+    moc.volume_up(gInitVolume)
+    gCurrVolume = gInitVolume
+    print "Reset volume: " , gCurrVolume
+
+
+def VolumeUp(num):
+    global gCurrVolume
+    gCurrVolume += num
+    moc.volume_up(num)
+
+def VolumeDown(num):
+    global gCurrVolume
+    gCurrVolume -= num
+    moc.volume_down(num)
+
+def resetPlayer():
+    #shuffle
+    setShuffle(False)
+    #repeat all
+    setRepeat(True)
+    #auto play next
+    setAutoNext(True)
+    # set defualt volume
+    resetVolume()
+    print "Player reset"
 
 #check moc status.
 def check():
@@ -64,6 +141,15 @@ def getInfo():
         return -1
 
     return info
+
+#get Volume, Shuffle, Repeat, AutoNext info.
+def getMiscInfo():
+    global gCurrVolume, gIsShuffle, gIsRepeat, gIsAutoNext
+    
+    return {'Volume': gCurrVolume,
+            'Shuffle': gIsShuffle,
+            'Repeat': gIsRepeat,
+            'AutoNext': gIsAutoNext}
 
 #doPrev will change state to STOP if playing frist song.
 def doPrev():
@@ -126,7 +212,8 @@ def doQuit():
 
 
 def doVolume(vol):
-    return 0
+    setVolume(vol)
+    return 0 
 
 def doSeek(sec):
     try:
@@ -135,3 +222,5 @@ def doSeek(sec):
         print traceback.fomrmat_exc()
         return -1
     return 0
+
+
