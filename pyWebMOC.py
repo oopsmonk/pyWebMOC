@@ -102,7 +102,7 @@ def CtlHandle(data):
             ret = player.doQuit()
         elif act == 'Seek':
             sec = data.get('doSeek')
-            ret = player.doSeek(sec)
+            ret = player.doSeek(int(sec))
         elif act == 'Toggles':
             shuffle = data.get('Shuffle')
             repeat = data.get('Repeat')

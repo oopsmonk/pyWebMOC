@@ -78,13 +78,21 @@ $(document).bind('pageinit', function(){
                 }
 
                 if(index == "totaltime"){
-                    gTotalTime = HHMMtoSec(value);
+                    if(gTotalTime != value){
+                        gTotalTime = HHMMtoSec(value);
+                        $('#slider-time').attr("max", gTotalTime);
+                    }
                 }
 
                 if(index == "currentsec"){
-                    gCurrTime = value;
+                    if(gCurrTime != value){
+                        if($('#slider-time').is(":disabled")){
+                            $('#slider-time').slider('enable');
+                        }
+                        gCurrTime = value;
+                        $('#slider-time').val(gCurrTime).slider('refresh');
+                    }
                 }
-
 
 
             });
@@ -99,13 +107,14 @@ $(document).bind('pageinit', function(){
     var gVolume = 0;
     var gTotalTime = 0;
     var gCurrTime = 0;
+    var gPlayerState = 0;
 
     //http://code.google.com/p/jquery-timer/
     var infoTrigger = $.timer(function(){
         //alert("getInfo");
         getInfo();
     });
-    infoTrigger.set({time:7000, autostart:true});
+    infoTrigger.set({time:1000, autostart:true});
 
     //Get init data from server
     getInfo();
@@ -118,6 +127,7 @@ $(document).bind('pageinit', function(){
 
     $('#btnPlay').click(function(){
         actionEmit({"do":"Play"});
+        infoTrigger.play();        
     });
 
     $('#btnNext').click(function(){
@@ -126,10 +136,15 @@ $(document).bind('pageinit', function(){
     
     $('#btnPause').click(function(){
         actionEmit({"do":"Pause"});
+        if(infoTrigger.isActive)
+            infoTrigger.stop();  
+        else
+            infoTrigger.play();
     });
 
     $('#btnStop').click(function(){
         actionEmit({"do":"Stop"});
+        infoTrigger.stop();        
     });
 
     //Toggle switch
@@ -166,6 +181,27 @@ $(document).bind('pageinit', function(){
         actionEmit({"do":"Volume", "SetVolume":$(this).val()});
     });
 
+    //time bar
+    if(gCurrTime == 0){
+        $('#slider-time').slider('disable');
+    }
+    $('#slider-time').attr({
+        "min": 0, 
+        "max": gTotalTime,
+        "step": 1});
+
+    $('#slider-time').val(gCurrTime).slider('refresh');
+
+    $('#slider-time').on('slidestart', function(event, ui){
+        infoTrigger.stop();        
+    });
+    $('#slider-time').on('slidestop', function(event, ui){
+        var v = $(this).val() - gCurrTime;
+
+        //alert("do seek to " + v );
+        actionEmit({"do":"Seek", "doSeek": v});
+        infoTrigger.play();
+    });
     
 }); //End of Page init
 
