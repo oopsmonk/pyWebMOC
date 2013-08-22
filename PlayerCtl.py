@@ -71,6 +71,8 @@ def isAutoNext():
     global gIsAutoNext
     return gIsAutoNext
 
+# RPi set PCM volume range  (-10239 - 400)
+# amixer cset numid=1 -- 70%     (-2790)
 def setVolume(v):
     global gCurrVolume
     tmp = v - gCurrVolume
