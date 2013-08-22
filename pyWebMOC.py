@@ -3,7 +3,7 @@
 # Static Routes http://stackoverflow.com/questions/10486224/bottle-static-files
 
 from bottle import route, static_file, debug, run, get, redirect
-from bottle import post, request, response
+from bottle import post, request
 import os, inspect, json
 import PlayerCtl as player
 
@@ -17,7 +17,8 @@ rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 
 @route(routePath)
 def rootHome():
-    return redirect(routePath+'/index.html')
+    #return redirect(routePath+'/index.html')
+    return redirect(routePath+'/WebMOC.html')
 
 @route(routePath + '/<filename:re:.*\.html>')
 def html_file(filename):
@@ -96,7 +97,7 @@ def CtlHandle(data):
             ret = player.doPause()
         elif act == 'Volume':
             vol = data.get('SetVolume')
-            ret = player.doVolume(vol)
+            ret = player.doVolume(int(vol))
         elif act == 'Quit':
             ret = player.doQuit()
         elif act == 'Seek':
@@ -150,11 +151,6 @@ def testJsonPost():
         return json.dumps({'Status':"Failed!"})
     else:
         return json.dumps({'Status':"Success!"})
-
-@get(routePath + '/gettest')
-def gettest():
-    return "get test return!!!\n"
-
 
 
 if player.check() == 0:

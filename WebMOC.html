@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="assets/css/jquery.mobile-1.3.2.min.css" />
 <script type="text/javascript" src="assets/js/jquery.js"></script>
 <script type="text/javascript" src="assets/js/jquery.mobile-1.3.2.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.timer.js"></script>
+<script type="text/javascript" src="assets/js/webmoc.js"></script>
 
 </head>
  
@@ -18,6 +20,7 @@ This is Web MOC controller.
     <a href="#" id="btnPause" data-role="button">Pause</a>
     <a href="#" id="btnStop" data-role="button">Stop</a>
 </div>
+
 <div data-role="fieldcontain" data-type="horizontal">
     <fieldset data-role="controlgroup">
         <label for="swShuffle">Shuffle:</label>
@@ -26,6 +29,7 @@ This is Web MOC controller.
             <option value="On">On</option>
         </select>
     </fieldset>
+
     <fieldset data-role="controlgroup">
         <label for="swRepeat">Repeat:</label>
         <select name ="swRepeat" id = "swRepeat" data-role="slider">
@@ -33,6 +37,7 @@ This is Web MOC controller.
             <option value="On">On</option>
         </select>
     </fieldset>
+
     <fieldset data-role="controlgroup">
         <label for="swAutoNext">AutoNext:</label>
         <select name ="swAutoNext" id = "swAutoNext" data-role="slider">
@@ -41,147 +46,12 @@ This is Web MOC controller.
         </select>
     </fieldset>
 </div>
-<script>
-    var ctlpage = 'ctl';
-    var gShuffle = 'Off';
-    var gRepeat = 'On';
-    var gAutoNext = 'On';
-    //button action 
-    $("#btnPrev").click(function(){
-        $.ajax
-        ({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify({"do":"Prev"}),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    });
 
-    $("#btnPlay").click(function(){
-        $.ajax
-        ({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify({"do":"Play"}),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    });
+<!-- Volume Slider -->
+<div>
+    <label for="slider-vol">Volume:</label>
+    <input type="range" name="slider-vol" id="slider-vol" min="0" max="100" data-highlight="true" />
+</div>
 
-    $("#btnNext").click(function(){
-        $.ajax
-        ({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify({"do":"Next"}),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    });
-    
-    $("#btnPause").click(function(){
-        $.ajax
-        ({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify({"do":"Pause"}),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    });
-    $("#btnStop").click(function(){
-        $.ajax
-        ({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify({"do":"Stop"}),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    });
-
-    //Toggle switch
-    $("#swShuffle").change(function(){
-        //set value to player
-        //alert("Toggle Shuffle set : " + $(this).val());
-        var value = $(this).val();
-        if (value != gShuffle){
-            gShuffle = value
-            $.ajax({
-                type: 'POST',
-                url: ctlpage,
-                data:JSON.stringify({"do":"Toggles", "Shuffle":value}),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json'
-            });
-        }
-    });
-
-    $("#swRepeat").change(function(){
-        //set value to player
-        var value = $(this).val();
-        if (value != gRepeat){
-            gRepeat = value
-            $.ajax({
-                type: 'POST',
-                url: ctlpage,
-                data:JSON.stringify({"do":"Toggles", "Repeat":value}),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json'
-            });
-        }
-    });
-
-    $("#swAutoNext").change(function(){
-        //set value to player
-        var value = $(this).val();
-        if (value != gAutoNext){
-            gAutoNext = value
-            $.ajax({
-                type: 'POST',
-                url: ctlpage,
-                data:JSON.stringify({"do":"Toggles", "AutoNext":value}),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json'
-            });
-        }
-    });
-</script>
 </body>
 </html>

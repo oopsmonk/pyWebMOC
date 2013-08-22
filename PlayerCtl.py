@@ -9,17 +9,22 @@ import traceback
 gInitVolume = 20
 gCurrVolume = gInitVolume
 
-gIsShuffle = "Off"
-gIsRepeat = "On"
-gIsAutoNext = "On"
-
-tupleTrue = ['True','ture',1,'On','on']
+gIsShuffle = False
+gIsRepeat = True
+gIsAutoNext = True
 
 def setShuffle(isOn):
     global gIsShuffle
-    gIsShuffle = isOn 
+    if type(isOn) is bool:
+        gIsShuffle = isOn 
+    else:
+        if isOn in ['On', 'on']:
+            gIsShuffle = True
+        else:
+            gIsShuffle = False
+
     print "set Shuffle : ", gIsShuffle 
-    if isOn in ["on","On"]:
+    if gIsShuffle:
         moc.enable_shuffle()
     else:
         moc.disable_shuffle()
@@ -30,8 +35,15 @@ def isShuffle():
 
 def setRepeat(isOn):
     global gIsRepeat
-    gIsRepeat = isOn 
-    if isOn in ["on","On"]:
+    if type(isOn) is bool:
+        gIsRepeat = isOn 
+    else:
+        if isOn in ['On', 'on']:
+            gIsRepeat = True
+        else:
+            gIsRepeat = False
+    
+    if gIsRepeat:
         moc.enable_repeat()
     else:
         moc.disable_repeat()
@@ -42,8 +54,15 @@ def isRepeat():
 
 def setAutoNext(isOn):
     global gIsAutoNext
-    gIsAutoNext = isOn 
-    if isOn in ["on","On"]:
+    if type(isOn) is bool:
+        gIsAutoNext = isOn 
+    else:
+        if isOn in ['On', 'on']:
+            gIsAutoNext = True
+        else:
+            gIsAutoNext = False
+    
+    if gIsAutoNext:
         moc.enable_autonext()
     else:
         moc.disable_autonext()
@@ -145,14 +164,20 @@ def getInfo():
 
     return info
 
+#boolean value to On/Off string
+def toOnOff(b):
+    if b:
+        return "On"
+    return "Off"
+
 #get Volume, Shuffle, Repeat, AutoNext info.
 def getMiscInfo():
     global gCurrVolume, gIsShuffle, gIsRepeat, gIsAutoNext
     
     return {'Volume': gCurrVolume,
-            'Shuffle': gIsShuffle,
-            'Repeat': gIsRepeat,
-            'AutoNext': gIsAutoNext}
+            'Shuffle': toOnOff(gIsShuffle),
+            'Repeat': toOnOff(gIsRepeat),
+            'AutoNext': toOnOff(gIsAutoNext)}
 
 #doPrev will change state to STOP if playing frist song.
 def doPrev():
