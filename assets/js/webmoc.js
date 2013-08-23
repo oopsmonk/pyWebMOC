@@ -286,8 +286,7 @@ $(document).bind('pageinit', function(){
 
         //alert("do seek to " + v );
         actionEmit({"do":"Seek", "doSeek": v});
-        getInfo();
-        infoTrigger.play();
+        setTimeout(function(){getInfo();infoTrigger.play();},gInfoDelay);
     });
     
     //Get init data from server
