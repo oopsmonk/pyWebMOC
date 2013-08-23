@@ -129,6 +129,14 @@ def MOCControlPOST():
     print "Get cmd : ", data
     return CtlHandle(data)
 
+
+#get playlist 
+@get(routePath + '/playlist')
+def MOCPlaylistGET():
+    plist = player.getSongList()
+    print "Get info : \n", plist
+    return json.dumps({"playlist":plist})
+
 #http://gotofritz.net/blog/weekly-challenge/restful-python-api-bottle/
 """
 POST action

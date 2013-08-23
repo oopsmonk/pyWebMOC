@@ -38,6 +38,33 @@ $(document).bind('pageinit', function(){
         }
         return seconds;
     }
+    
+    //create playlist
+    function genPlaylist(){
+        $.getJSON('playlist', function(data){
+            $.each(data, function(index, value){
+                if(index == "playlist"){
+                    //alert("data = " + value[0].toString());
+                    //clear list
+                    $('#play-list').empty();
+                    
+                    //creat play list
+                    for(var i in value){
+                        $('#play-list').append('<li><a href'+ "#" + ' id="pItem" ">' + value[i].toString() + '</a> </li>');
+                    }
+                    
+                    //refresh list
+                    $('#play-list').listview('refresh');
+
+                    //bind click action
+                    $('ul').children('li').on('click', function () {
+                        var selected_index = $(this).index();
+                        alert('Selected Index = ' + selected_index);
+                    });
+                }
+            });
+        });
+    }
 
     //get moc server info
     function getInfo(){
@@ -47,6 +74,10 @@ $(document).bind('pageinit', function(){
                 //alert("index: " + index + " , value: "+ value);
                 if(index == "state"){
                     gPlayerState = value;
+                    //playing
+                    if(gPlayerState == 2){
+                        setTimeout(function(){genPlaylist();},gInfoDelay);
+                    }
                 }
 
                 if(index == "artist"){

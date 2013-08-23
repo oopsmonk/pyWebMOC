@@ -131,6 +131,14 @@ def check():
         return -1
     return 0
 
+#get current song list from moc.
+def getSongList():
+    plist = moc.get_playlist()
+    flist = []
+    for i in range(len(plist)):
+        flist.append(plist[i][0])
+    return flist
+
 #get current play list from moc.
 def getFileList():
     plist = moc.get_playlist()
