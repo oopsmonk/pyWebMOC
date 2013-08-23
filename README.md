@@ -18,3 +18,30 @@ python-moc
     playlist, song title, artist, duration.  
     TODO: bitrate, rate.
 
+##Server API test use curl  
+
+ACTION: Prev, Play, Next, Stop, Pause, Quit  
+
+    curl -X POST -H "Content-Type: application/json" -d '{"do":ACTION}' http://localhost:8080/pyWebMOC/ctl
+
+Example of Play action:  
+
+    curl -X POST -H "Content-Type: application/json" -d '{"do":"Play"}' http://localhost:8080/pyWebMOC/ctl  
+
+
+Example of Volume set to 10:  
+
+    curl -X POST -H "Content-Type: application/json" -d '{"do":"Volume", "SetVolume":10}' http://localhost:8080/pyWebMOC/ctl
+
+Example of Seek -20:  
+
+    curl -X POST -H "Content-Type: application/json" -d '{"do":"Seek", "doSeek":-20}' http://localhost:8080/pyWebMOC/ctl
+
+Example of get info:  
+
+    curl -X GET http://localhost:8080/pyWebMOC/ctl  
+
+Example of get Playlist:  
+
+    curl -X GET http://localhost:8080/pyWebMOC/playlist
+
