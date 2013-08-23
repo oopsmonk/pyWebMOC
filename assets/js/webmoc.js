@@ -9,6 +9,24 @@ $(document).ready(function(){
 $(document).bind('pageinit', function(){
     //alert("page init done!");
 
+    //convert String to HHMMSS
+    String.prototype.toHHMMSS = function () {
+        var sec_num = parseInt(this, 10); 
+        var hours   = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+        if (hours   < 10) {hours   = "0"+hours;}
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) {seconds = "0"+seconds;}
+        var time = 0;
+        if( parseInt(hours) == 0 )
+           time = minutes+':'+seconds;
+        else
+            time = hours+':'+minutes+':'+seconds;        
+        return time;
+    }
+
     //convert time HH:mm:ss to seconds
     function HHMMtoSec(t){
         var array_t = t.split(":");
@@ -21,30 +39,26 @@ $(document).bind('pageinit', function(){
         return seconds;
     }
 
-    //post json
-    function actionEmit(jdata){
-        $.ajax({
-            type: 'POST',
-            url: ctlpage,
-            data:JSON.stringify(jdata),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data){
-                $.each(data, function(index, value){
-                    //alert("index: " + index + " , value: "+ value);
-                    if(index == "ack" && value != 0)
-                        alert("Error : " + value);
-                });
-            }
-        });
-    }
-
     //get moc server info
     function getInfo(){
     
         $.getJSON(ctlpage, function(data){
             $.each(data, function(index, value){
                 //alert("index: " + index + " , value: "+ value);
+                if(index == "state"){
+                    gPlayerState = value;
+                }
+
+                if(index == "artist"){
+                    gArtist = value;
+                    $('#song-artist').html(gArtist);
+                }
+
+                if(index == "songtitle"){
+                    gSongTitle = value;
+                    $('#song-title').html(gSongTitle);
+                }
+
                 if(index == "Shuffle"){
                     if(gShuffle != value){
                         //alert(index + " = " + value);
@@ -79,6 +93,7 @@ $(document).bind('pageinit', function(){
 
                 if(index == "totaltime"){
                     if(gTotalTime != value){
+                        gTotalTimeMMSS = value;
                         gTotalTime = HHMMtoSec(value);
                         $('#slider-time').attr("max", gTotalTime);
                     }
@@ -99,6 +114,25 @@ $(document).bind('pageinit', function(){
         });    
     }
 
+    //post json
+    function actionEmit(jdata){
+        $.ajax({
+            type: 'POST',
+            url: ctlpage,
+            data:JSON.stringify(jdata),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            success: function(data){
+                $.each(data, function(index, value){
+                    //alert("index: " + index + " , value: "+ value);
+                    if(index == "ack" && value != 0)
+                        alert("Error : " + value);
+                });
+            }
+        });
+        
+    }
+
 
     var ctlpage = 'ctl';
     var gShuffle = 'Off';
@@ -106,32 +140,52 @@ $(document).bind('pageinit', function(){
     var gAutoNext = 'Off';
     var gVolume = 0;
     var gTotalTime = 0;
+    var gTotalTimeMMSS = "00:00";
     var gCurrTime = 0;
     var gPlayerState = 0;
+    var gSongTitle ="";
+    var gArtist = "";
+    var gInfoDelay = 1000;
+    var gUpdateTime = 1000;
 
     //http://code.google.com/p/jquery-timer/
     var infoTrigger = $.timer(function(){
-        //alert("getInfo");
-        getInfo();
-    });
-    infoTrigger.set({time:1000, autostart:true});
+        
+        if(gPlayerState == 2){
+            if((gCurrTime >= gTotalTime) || (gCurrTime == 0)){
+                getInfo();
 
-    //Get init data from server
-    getInfo();
+            }else{
+                gCurrTime = parseInt(gCurrTime) + 1;
+                if($('#slider-time').is(":disabled")){
+                    $('#slider-time').slider('enable');
+                }
+                $('#slider-time').val(gCurrTime).slider('refresh');
+            }
+        }
+        
+    });
 
 
     //button action 
     $('#btnPrev').click(function(){
         actionEmit({"do":"Prev"});
+        if(!infoTrigger.isActive)
+            infoTrigger.play();  
+        setTimeout(function(){getInfo();},gInfoDelay);
     });
 
     $('#btnPlay').click(function(){
         actionEmit({"do":"Play"});
         infoTrigger.play();        
+        setTimeout(function(){getInfo();},gInfoDelay);
     });
 
     $('#btnNext').click(function(){
         actionEmit({"do":"Next"});
+        if(!infoTrigger.isActive)
+            infoTrigger.play();  
+        setTimeout(function(){getInfo();},gInfoDelay);
     });
     
     $('#btnPause').click(function(){
@@ -140,6 +194,7 @@ $(document).bind('pageinit', function(){
             infoTrigger.stop();  
         else
             infoTrigger.play();
+        setTimeout(function(){getInfo();},gInfoDelay);
     });
 
     $('#btnStop').click(function(){
@@ -200,9 +255,16 @@ $(document).bind('pageinit', function(){
 
         //alert("do seek to " + v );
         actionEmit({"do":"Seek", "doSeek": v});
+        getInfo();
         infoTrigger.play();
     });
     
+    //Get init data from server
+    getInfo();
+
+    //start info timer
+    infoTrigger.set({time:1000, autostart:true});
+
 }); //End of Page init
 
 
