@@ -5,9 +5,7 @@ import moc
 import math
 import traceback
 
-
-gInitVolume = 20
-gCurrVolume = gInitVolume
+gCurrVolume = 10 
 
 gIsShuffle = False
 gIsRepeat = True
@@ -71,8 +69,6 @@ def isAutoNext():
     global gIsAutoNext
     return gIsAutoNext
 
-# RPi set PCM volume range  (-10239 - 400)
-# amixer cset numid=1 -- 70%     (-2790)
 def setVolume(v):
     global gCurrVolume
     tmp = v - gCurrVolume
@@ -86,15 +82,11 @@ def setVolume(v):
 
 def getVolume():
     global gCurrVolume
+
+    info_dict = getInfo()
+    gCurrVolume = int(info_dict.get('volume'))
+    print("get volume", gCurrVolume)
     return gCurrVolume
-
-def resetVolume():
-    global gCurrVolume, gInitVolume
-    moc.volume_down(100)
-    moc.volume_up(gInitVolume)
-    gCurrVolume = gInitVolume
-    print "Reset volume: " , gCurrVolume
-
 
 def VolumeUp(num):
     global gCurrVolume
@@ -107,6 +99,7 @@ def VolumeDown(num):
     moc.volume_down(num)
 
 def resetPlayer():
+    print "Player reset"
     #shuffle
     setShuffle(False)
     #repeat all
@@ -114,8 +107,7 @@ def resetPlayer():
     #auto play next
     setAutoNext(True)
     # set defualt volume
-    resetVolume()
-    print "Player reset"
+    getVolume()
 
 #check moc status.
 def check():
@@ -124,6 +116,8 @@ def check():
         if moc.get_state() == -1:
             moc.start_server()
             print "moc server state :", moc.get_state()
+
+        #get defutal status
 
     except moc.MocError as err:
         print "Error: ", err
@@ -182,10 +176,9 @@ def toOnOff(b):
 
 #get Volume, Shuffle, Repeat, AutoNext info.
 def getMiscInfo():
-    global gCurrVolume, gIsShuffle, gIsRepeat, gIsAutoNext
+    global gIsShuffle, gIsRepeat, gIsAutoNext
     
-    return {'Volume': gCurrVolume,
-            'Shuffle': toOnOff(gIsShuffle),
+    return {'Shuffle': toOnOff(gIsShuffle),
             'Repeat': toOnOff(gIsRepeat),
             'AutoNext': toOnOff(gIsAutoNext)}
 

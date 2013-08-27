@@ -3,9 +3,6 @@
  *
  *
  */
-$(document).ready(function(){
-//    alert("Doc ready");
-});
 $(document).bind('pageinit', function(){
     //alert("page init done!");
 
@@ -114,7 +111,7 @@ $(document).bind('pageinit', function(){
                     }
                 }
                 
-                if(index =="Volume"){
+                if(index =="volume"){
                     if(gVolume != value){
                         gVolume = value;
                         //alert(index + " = " + value);
