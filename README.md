@@ -1,5 +1,7 @@
 #pyWebMOC  
-This is a web service for control MOC on Linux and Raspberry pi.  
+Copyright (c) 2013, OopsMonk <oopsmonk@gmail.com>
+See LICENSE for licensing information.
+A web server application for control MOC on Linux and Raspberry pi.  
 
 ##Requires  
 moc  
