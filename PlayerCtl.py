@@ -199,7 +199,8 @@ def doPlay():
         if st == 0:
             plist = getFileList()
             print "Playlist : " , plist
-            moc.play(plist)
+            #moc.play(plist)
+            moc.quickplay(plist)
         elif st == 1:
             moc.resume()
 
@@ -254,4 +255,11 @@ def doSeek(sec):
         return -1
     return 0
 
+def doPlayNum(index):
+    try:
+        moc.play_num(int(index))
+    except:
+        print traceback.fomrmat_exc()
+        return -1
+    return 0
 

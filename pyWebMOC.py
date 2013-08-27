@@ -113,6 +113,9 @@ def CtlHandle(data):
                 player.setRepeat(repeat)
             if autoNext is not None:
                 player.setAutoNext(autoNext)
+        elif act == 'PlayIndex':
+            index = data.get('Index')
+            ret = player.doPlayNum(index)
 
         print "ret  = ", ret
         return json.dumps({'ack': ret})

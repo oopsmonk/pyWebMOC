@@ -36,6 +36,81 @@ $(document).bind('pageinit', function(){
         return seconds;
     }
     
+    //get moc server info without playlist
+    function getInfoOnly(){
+    
+        $.getJSON(ctlpage, function(data){
+            $.each(data, function(index, value){
+                //alert("index: " + index + " , value: "+ value);
+                if(index == "state"){
+                    gPlayerState = value;
+                }
+
+                if(index == "artist"){
+                    gArtist = value;
+                    $('#song-artist').html(gArtist);
+                }
+
+                if(index == "songtitle"){
+                    gSongTitle = value;
+                    $('#song-title').html(gSongTitle);
+                }
+
+                if(index == "Shuffle"){
+                    if(gShuffle != value){
+                        //alert(index + " = " + value);
+                        gShuffle = value;
+                        $('#swShuffle').val(gShuffle).slider('refresh');
+                    }       
+                }
+
+                if(index == "Repeat"){
+                    if(gRepeat != value){
+                        gRepeat = value;
+                        $('#swRepeat').val(gRepeat).slider('refresh');
+                        //alert(index + " = " + value);
+                    }
+                }
+
+                if(index == "AutoNext"){
+                    if(gAutoNext != value){
+                        gAutoNext = value;
+                        $('#swAutoNext').val(gAutoNext).slider('refresh');
+                        //alert(index + " = " + value);
+                    }
+                }
+                
+                if(index =="volume"){
+                    if(gVolume != value){
+                        gVolume = value;
+                        //alert(index + " = " + value);
+                        $('#slider-vol').val(gVolume).slider('refresh');
+                    }
+                }
+
+                if(index == "totaltime"){
+                    if(gTotalTime != value){
+                        gTotalTimeMMSS = value;
+                        gTotalTime = HHMMtoSec(value);
+                        $('#slider-time').attr("max", gTotalTime);
+                    }
+                }
+
+                if(index == "currentsec"){
+                    if(gCurrTime != value){
+                        if($('#slider-time').is(":disabled")){
+                            $('#slider-time').slider('enable');
+                        }
+                        gCurrTime = value;
+                        $('#slider-time').val(gCurrTime).slider('refresh');
+                    }
+                }
+
+
+            });
+        });    
+    }
+
     //create playlist
     function genPlaylist(){
         $.getJSON('playlist', function(data){
@@ -56,14 +131,17 @@ $(document).bind('pageinit', function(){
                     //bind click action
                     $('ul').children('li').on('click', function () {
                         var selected_index = $(this).index();
-                        alert('Selected Index = ' + selected_index);
+                        //alert('Selected Index = ' + selected_index);
+                        actionEmit({"do":"PlayIndex", "Index":selected_index});
+                        setTimeout(function(){getInfoOnly();},gInfoDelay);
+
                     });
                 }
             });
         });
     }
 
-    //get moc server info
+    //get moc server info with palylist
     function getInfo(){
     
         $.getJSON(ctlpage, function(data){
@@ -200,7 +278,7 @@ $(document).bind('pageinit', function(){
         actionEmit({"do":"Prev"});
         if(!infoTrigger.isActive)
             infoTrigger.play();  
-        setTimeout(function(){getInfo();},gInfoDelay);
+        setTimeout(function(){getInfoOnly();},gInfoDelay);
     });
 
     $('#btnPlay').click(function(){
@@ -213,7 +291,7 @@ $(document).bind('pageinit', function(){
         actionEmit({"do":"Next"});
         if(!infoTrigger.isActive)
             infoTrigger.play();  
-        setTimeout(function(){getInfo();},gInfoDelay);
+        setTimeout(function(){getInfoOnly();},gInfoDelay);
     });
     
     $('#btnPause').click(function(){
@@ -222,7 +300,7 @@ $(document).bind('pageinit', function(){
             infoTrigger.stop();  
         else
             infoTrigger.play();
-        setTimeout(function(){getInfo();},gInfoDelay);
+        setTimeout(function(){getInfoOnly();},gInfoDelay);
     });
 
     $('#btnStop').click(function(){
@@ -283,7 +361,7 @@ $(document).bind('pageinit', function(){
 
         //alert("do seek to " + v );
         actionEmit({"do":"Seek", "doSeek": v});
-        setTimeout(function(){getInfo();infoTrigger.play();},gInfoDelay);
+        setTimeout(function(){getInfoOnly();infoTrigger.play();},gInfoDelay);
     });
     
     //Get init data from server
