@@ -35,81 +35,6 @@ $(document).bind('pageinit', function(){
         }
         return seconds;
     }
-    
-    //get moc server info without playlist
-    function getInfoOnly(){
-    
-        $.getJSON(ctlpage, function(data){
-            $.each(data, function(index, value){
-                //alert("index: " + index + " , value: "+ value);
-                if(index == "state"){
-                    gPlayerState = value;
-                }
-
-                if(index == "artist"){
-                    gArtist = value;
-                    $('#song-artist').html(gArtist);
-                }
-
-                if(index == "songtitle"){
-                    gSongTitle = value;
-                    $('#song-title').html(gSongTitle);
-                }
-
-                if(index == "Shuffle"){
-                    if(gShuffle != value){
-                        //alert(index + " = " + value);
-                        gShuffle = value;
-                        $('#swShuffle').val(gShuffle).slider('refresh');
-                    }       
-                }
-
-                if(index == "Repeat"){
-                    if(gRepeat != value){
-                        gRepeat = value;
-                        $('#swRepeat').val(gRepeat).slider('refresh');
-                        //alert(index + " = " + value);
-                    }
-                }
-
-                if(index == "AutoNext"){
-                    if(gAutoNext != value){
-                        gAutoNext = value;
-                        $('#swAutoNext').val(gAutoNext).slider('refresh');
-                        //alert(index + " = " + value);
-                    }
-                }
-                
-                if(index =="volume"){
-                    if(gVolume != value){
-                        gVolume = value;
-                        //alert(index + " = " + value);
-                        $('#slider-vol').val(gVolume).slider('refresh');
-                    }
-                }
-
-                if(index == "totaltime"){
-                    if(gTotalTime != value){
-                        gTotalTimeMMSS = value;
-                        gTotalTime = HHMMtoSec(value);
-                        $('#slider-time').attr("max", gTotalTime);
-                    }
-                }
-
-                if(index == "currentsec"){
-                    if(gCurrTime != value){
-                        if($('#slider-time').is(":disabled")){
-                            $('#slider-time').slider('enable');
-                        }
-                        gCurrTime = value;
-                        $('#slider-time').val(gCurrTime).slider('refresh');
-                    }
-                }
-
-
-            });
-        });    
-    }
 
     //create playlist
     function genPlaylist(){
@@ -141,82 +66,129 @@ $(document).bind('pageinit', function(){
         });
     }
 
+    //process info data from server.
+    function processInfo(index, value, plist){
+
+        if(index == "state"){
+            gPlayerState = value;
+            //playing
+            if((gPlayerState == 2) && plist){
+                setTimeout(function(){genPlaylist();},gInfoDelay);
+            }
+        }
+
+        if(index == "artist"){
+            gArtist = value;
+            //$('#song-artist').html(gArtist);
+        }
+
+        if(index == "songtitle"){
+            gSongTitle = value;
+            //$('#song-title').html(gSongTitle);
+        }
+
+        if(index == "Shuffle"){
+            if(gShuffle != value){
+                //alert(index + " = " + value);
+                gShuffle = value;
+                $('#swShuffle').val(gShuffle).slider('refresh');
+            }       
+        }
+
+        if(index == "Repeat"){
+            if(gRepeat != value){
+                gRepeat = value;
+                $('#swRepeat').val(gRepeat).slider('refresh');
+                //alert(index + " = " + value);
+            }
+        }
+
+        if(index == "AutoNext"){
+            if(gAutoNext != value){
+                gAutoNext = value;
+                $('#swAutoNext').val(gAutoNext).slider('refresh');
+                //alert(index + " = " + value);
+            }
+        }
+        
+        if(index =="volume"){
+            if(gVolume != value){
+                gVolume = value;
+                //alert(index + " = " + value);
+                $('#slider-vol').val(gVolume).slider('refresh');
+            }
+        }
+
+        if(index == "totaltime"){
+            if(gTotalTime != value){
+                gTotalTimeMMSS = value;
+                gTotalTime = HHMMtoSec(value);
+                //$('#slider-time').attr("max", gTotalTime);
+            }
+        }
+
+        if(index == "currentsec"){
+            if(gCurrTime != value){
+                //if($('#slider-time').is(":disabled")){
+                //    $('#slider-time').slider('enable');
+                //}
+                gCurrTime = value;
+                //$('#slider-time').val(gCurrTime).slider('refresh');
+            }
+        }
+
+        if(index == "file"){
+            gFilePath = value;
+            gIsNetStream = gFilePath.startsWith("http:");
+        }
+    }
+
+    //file format detection, update info on GUI
+    function displayInfo(){
+
+        if(gIsNetStream){ //network streaming
+            //disable time bar
+            $('#slider-time').slider('disable');
+            $('#song-title').html('Network Streaming');
+            $('#song-artist').html(gFilePath);
+
+
+        }else{ //local file
+            
+            if($('#slider-time').is(":disabled")){
+                $('#slider-time').slider('enable');
+            }
+            $('#song-artist').html(gArtist);
+            $('#song-title').html(gSongTitle);
+            $('#slider-time').attr("max", gTotalTime);
+            $('#slider-time').val(gCurrTime).slider('refresh');
+        }
+    }
+    
+    //get moc server info without playlist
+    function getInfoOnly(){
+    
+        $.getJSON(ctlpage, function(data){
+            $.each(data, function(index, value){
+                //alert("index: " + index + " , value: "+ value);
+                processInfo(index, value, false);
+            });
+
+            displayInfo();
+        });    
+    }
+
     //get moc server info with palylist
     function getInfo(){
     
         $.getJSON(ctlpage, function(data){
             $.each(data, function(index, value){
                 //alert("index: " + index + " , value: "+ value);
-                if(index == "state"){
-                    gPlayerState = value;
-                    //playing
-                    if(gPlayerState == 2){
-                        setTimeout(function(){genPlaylist();},gInfoDelay);
-                    }
-                }
-
-                if(index == "artist"){
-                    gArtist = value;
-                    $('#song-artist').html(gArtist);
-                }
-
-                if(index == "songtitle"){
-                    gSongTitle = value;
-                    $('#song-title').html(gSongTitle);
-                }
-
-                if(index == "Shuffle"){
-                    if(gShuffle != value){
-                        //alert(index + " = " + value);
-                        gShuffle = value;
-                        $('#swShuffle').val(gShuffle).slider('refresh');
-                    }       
-                }
-
-                if(index == "Repeat"){
-                    if(gRepeat != value){
-                        gRepeat = value;
-                        $('#swRepeat').val(gRepeat).slider('refresh');
-                        //alert(index + " = " + value);
-                    }
-                }
-
-                if(index == "AutoNext"){
-                    if(gAutoNext != value){
-                        gAutoNext = value;
-                        $('#swAutoNext').val(gAutoNext).slider('refresh');
-                        //alert(index + " = " + value);
-                    }
-                }
-                
-                if(index =="volume"){
-                    if(gVolume != value){
-                        gVolume = value;
-                        //alert(index + " = " + value);
-                        $('#slider-vol').val(gVolume).slider('refresh');
-                    }
-                }
-
-                if(index == "totaltime"){
-                    if(gTotalTime != value){
-                        gTotalTimeMMSS = value;
-                        gTotalTime = HHMMtoSec(value);
-                        $('#slider-time').attr("max", gTotalTime);
-                    }
-                }
-
-                if(index == "currentsec"){
-                    if(gCurrTime != value){
-                        if($('#slider-time').is(":disabled")){
-                            $('#slider-time').slider('enable');
-                        }
-                        gCurrTime = value;
-                        $('#slider-time').val(gCurrTime).slider('refresh');
-                    }
-                }
-
+                processInfo(index, value, true);
 
             });
+
+            displayInfo();
         });    
     }
 
@@ -253,11 +225,13 @@ $(document).bind('pageinit', function(){
     var gArtist = "";
     var gInfoDelay = 1000;
     var gUpdateTime = 1000;
+    var gFilePath = "";
+    var gIsNetStream = new Boolean();
 
     //http://code.google.com/p/jquery-timer/
     var infoTrigger = $.timer(function(){
         
-        if(gPlayerState == 2){
+        if((gPlayerState == 2) && !gIsNetStream){
             if((gCurrTime >= gTotalTime) || (gCurrTime == 0)){
                 getInfo();
 
