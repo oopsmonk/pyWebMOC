@@ -139,7 +139,8 @@ $(document).bind('pageinit', function(){
 
         if(index == "file"){
             gFilePath = value;
-            gIsNetStream = gFilePath.startsWith("http:");
+            //gIsNetStream = gFilePath.startsWith("http:"); //not support in IE, Chrome.
+            gIsNetStream = gFilePath.indexOf("http:") != -1;
         }
     }
 
