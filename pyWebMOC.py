@@ -12,8 +12,21 @@ debug(True)
 
 # WebApp route path
 routePath = '/pyWebMOC'
+playlistPath = '/assets/playlists'
+
 # get directory of WebApp (pyWebMOC.py's dir)
 rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+#get m3u files in server
+def getM3UFiles():
+    files = os.listdir(rootPath + playlistPath)
+    playlists = [ f for f in files if f.find("m3u") != -1 ]
+    return playlists 
+
+#append list to current playlist
+def m3uAppend(fileName, clean):
+    path = rootPath + playlistPath + "/" +fileName
+    return player.listAppend(path, clean)
 
 @route(routePath)
 def rootHome():
@@ -28,30 +41,6 @@ def html_file(filename):
 def assets_file(filepath):
     return static_file(filepath, root=rootPath+'/assets')
 
-"""
-Function list
-* Player control GET
-    * return moc server state (play/stop/pause/not running)
-
-* Player control POST
-    * Previous
-    * Play / Resume
-    * Next
-    * Pause
-    * Stop
-    * volume
-
-* Player info
-    * Song name
-    * current time
-    * duration
-
-* Play list
-    * Append
-    * add (clean old list)
-    * clean
-
-"""
 
 #control GET API return 
 @get(routePath + '/ctl')
@@ -116,6 +105,10 @@ def CtlHandle(data):
         elif act == 'PlayIndex':
             index = data.get('Index')
             ret = player.doPlayNum(index)
+        elif act == 'm3u':
+            fileName = data.get('file')
+            clear = data.get('clear')
+            ret = m3uAppend(fileName, clear)
 
         print "ret  = ", ret
         return json.dumps({'ack': ret})
@@ -139,6 +132,13 @@ def MOCPlaylistGET():
     plist = player.getSongList()
     print "Get Playlist : \n", plist
     return json.dumps({"playlist":plist})
+
+#get m3u list 
+@get(routePath + '/m3u')
+def M3UList():
+    plist =  getM3UFiles()
+    print "Get m3u list : \n", plist
+    return json.dumps({"m3u":plist})
 
 #http://gotofritz.net/blog/weekly-challenge/restful-python-api-bottle/
 """

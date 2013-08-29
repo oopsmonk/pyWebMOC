@@ -4,6 +4,7 @@
 import moc
 import math
 import traceback
+import os
 
 gCurrVolume = 10 
 
@@ -263,3 +264,19 @@ def doPlayNum(index):
         return -1
     return 0
 
+#append list to current playlist
+def listAppend(path, isClear):
+    #check is a file and exist
+    if os.path.isfile(path) is not True:
+        print "file not exist : ", path
+        return -1
+
+    #clean current playlist
+    if isClear == True:
+        print "Playlist clean..."
+        moc.clear_playlist()
+
+    #append list 
+    print "Playlist append : ", path
+    moc.m3u_append(path)
+    return 0
