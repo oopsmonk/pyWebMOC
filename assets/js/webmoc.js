@@ -147,22 +147,46 @@ $(document).bind('pageinit', function(){
     //file format detection, update info on GUI
     function displayInfo(){
 
-        if(gIsNetStream){ //network streaming
-            //disable time bar
+        if(gPlayerState == 0){ //Stopped
             $('#slider-time').slider('disable');
-            $('#song-title').html('Network Streaming');
-            $('#song-artist').html(gFilePath);
+            $('#song-title').html('Stopped');
+            $('#song-artist').html('');
+
+        }
+        else if(gPlayerState == 1){ //Paused
+            $('#song-title').html('Paused');
+
+        }
+        else if(gPlayerState == 2){ //Playing
+
+            if(gIsNetStream){ //network streaming
+                //disable time bar
+                $('#slider-time').slider('disable');
+                $('#song-title').html('Network Streaming');
+                $('#song-artist').html(gFilePath);
 
 
-        }else{ //local file
-            
-            if($('#slider-time').is(":disabled")){
-                $('#slider-time').slider('enable');
+            }else{ //local file
+                
+                if($('#slider-time').is(":disabled")){
+                    $('#slider-time').slider('enable');
+                }
+                $('#song-artist').html(gArtist);
+                $('#song-title').html(gSongTitle);
+                $('#slider-time').attr("max", gTotalTime);
+                $('#slider-time').val(gCurrTime).slider('refresh');
             }
-            $('#song-artist').html(gArtist);
-            $('#song-title').html(gSongTitle);
-            $('#slider-time').attr("max", gTotalTime);
-            $('#slider-time').val(gCurrTime).slider('refresh');
+
+        }
+        else if(gPlayerState == 3){ //Buffering
+            $('#slider-time').slider('disable');
+            $('#song-title').html('Buffering...');
+            $('#song-artist').html('');
+            $('#slider-time').val(0).slider('refresh');
+
+        }
+        else{   //unknow state
+
         }
     }
     
@@ -176,7 +200,11 @@ $(document).bind('pageinit', function(){
             });
 
             displayInfo();
-        });    
+            if(gPlayerState == 3){
+                setTimeout(function(){getInfoOnly();},3000);
+            }
+        }); 
+
     }
 
     //get moc server info with palylist
@@ -190,7 +218,11 @@ $(document).bind('pageinit', function(){
             });
 
             displayInfo();
-        });    
+            if(gPlayerState == 3){
+                setTimeout(function(){getInfo();},3000);
+            }
+        });   
+
     }
 
     //post json
@@ -221,7 +253,7 @@ $(document).bind('pageinit', function(){
     var gTotalTime = 0;
     var gTotalTimeMMSS = "00:00";
     var gCurrTime = 0;
-    var gPlayerState = 0;
+    var gPlayerState = 0; // -1:ServerNotRunning, 0:Stopped, 1:Paused, 2:Playing, 3:NetBuffering
     var gSongTitle ="";
     var gArtist = "";
     var gInfoDelay = 1000;
@@ -230,6 +262,7 @@ $(document).bind('pageinit', function(){
     var gIsNetStream = new Boolean();
 
     //http://code.google.com/p/jquery-timer/
+    //Update info on GUI
     var infoTrigger = $.timer(function(){
         
         if((gPlayerState == 2) && !gIsNetStream){
@@ -281,6 +314,7 @@ $(document).bind('pageinit', function(){
     $('#btnStop').click(function(){
         actionEmit({"do":"Stop"});
         infoTrigger.stop();        
+        setTimeout(function(){getInfoOnly();},gInfoDelay);
     });
 
     //Toggle switch
