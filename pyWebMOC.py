@@ -109,6 +109,11 @@ def CtlHandle(data):
             fileName = data.get('file')
             clear = data.get('clear')
             ret = m3uAppend(fileName, clear)
+        elif act == 'RemoveItems':
+            #index split by ','
+            index_list = data.get('index').split(',')
+            print "Remove items : ", index_list
+            player.removelistItems(index_list)
 
         print "ret  = ", ret
         return json.dumps({'ack': ret})

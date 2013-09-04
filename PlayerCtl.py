@@ -11,6 +11,7 @@ gCurrVolume = 10
 gIsShuffle = False
 gIsRepeat = True
 gIsAutoNext = True
+gPlaylist = [] # Create empty list.
 
 def setShuffle(isOn):
     global gIsShuffle
@@ -118,7 +119,8 @@ def check():
             moc.start_server()
             print "moc server state :", moc.get_state()
 
-        #get defutal status
+        #get server playlist
+        getPlaylist()
 
     except moc.MocError as err:
         print "Error: ", err
@@ -126,21 +128,53 @@ def check():
         return -1
     return 0
 
-#get current song list from moc.
-def getSongList():
-    plist = moc.get_playlist()
+#get playlist from server
+def getPlaylist():
+    global gPlaylist
+    gPlaylist = moc.get_playlist()
+    return gPlaylist
+
+#restore playlist to server
+def updatePlaylist():
+    global gPlaylist
     flist = []
-    for i in range(len(plist)):
-        flist.append(plist[i][0])
+    for i in range(len(gPlaylist)):
+        flist.append(gPlaylist[i][1])
+
+    print "updatePlaylist : ", flist 
+    if not flist:
+        moc.playlist_clear()
+        moc.playlist_append(flist)
+
+
+#get current song list from gPlaylist.
+def getSongList():
+    global gPlaylist
+    flist = []
+    for i in range(len(gPlaylist)):
+        flist.append(gPlaylist[i][0])
     return flist
 
-#get current play list from moc.
+#get current play list from gPlaylist.
 def getFileList():
-    plist = moc.get_playlist()
+    global gPlaylist
     flist = []
-    for i in range(len(plist)):
-        flist.append(plist[i][1])
+    for i in range(len(gPlaylist)):
+        flist.append(gPlaylist[i][1])
     return flist
+
+#remove playlist item from server
+def removelistItems(index_list):
+    global gPlaylist
+    index_list = map(int, index_list) #string list to int list
+    index_list.sort(reverse=True)
+    for index ,value in enumerate(index_list):
+        print "remove i: %s, value : %s" % (index, value)
+        if int(value) <= len(gPlaylist):
+            del gPlaylist[value]
+        else:
+            print "out of range(%s) : %s " % (len(gPlaylist), value)
+    updatePlaylist()
 
 # 0:STOPPED 1:PAUSED 2:PLAYING -1: Server not running
 def getStatus():

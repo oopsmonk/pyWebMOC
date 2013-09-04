@@ -375,7 +375,7 @@ $(document).bind('pageinit', function(){
     
     //Get init data from server
     getInfo();
-
+    genPlaylist();
     //start info timer
     infoTrigger.set({time:1000, autostart:true});
 
